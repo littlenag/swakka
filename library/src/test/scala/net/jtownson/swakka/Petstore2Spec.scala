@@ -743,7 +743,7 @@ class Petstore2Spec
           "scopes"-> JsObject(
             "write:pets" -> JsString("modify pets in your account"),
             "read:pets" -> JsString("read your pets"))
-        ),
+        )
       ),
       "paths" -> JsObject(
         "/pets" -> JsObject(
