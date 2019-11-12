@@ -74,7 +74,17 @@ object PetstoreV1 extends App {
     }
   }
 
+  val securityDefinitions = (
+    BasicAuthenticationSecurity(key = "basic_auth"),
+    Oauth2ImplicitSecurity(
+      key = "petstore_auth",
+      authorizationUrl = "http://petstore.swagger.io/oauth/dialog",
+      scopes = Some(Map("write:pets" -> "modify pets in your account", "read:pets" -> "read your pets"))),
+    ApiKeyInHeaderSecurity(key = "api_key"),
+  )
+
   val petstoreApi = OpenApi(
+    securityDefinitions = Some(securityDefinitions),
     info = Info(version = "1.0.0",
                 title = "Swagger Petstore",
                 licence = Some(License(name = "MIT"))),
@@ -89,6 +99,7 @@ object PetstoreV1 extends App {
         path = "/pets",
         method = GET,
         operation = Operation(
+          security = Some(Seq(SecurityRequirement('petstore_auth, Seq("read:pets")))),
           summary = Some("List all pets"),
           operationId = Some("listPets"),
           tags = Some(Seq("pets")),

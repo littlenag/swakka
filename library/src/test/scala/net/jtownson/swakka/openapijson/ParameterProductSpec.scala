@@ -13,6 +13,18 @@ import shapeless.{::, HNil}
 // 3) Tuples
 class ParameterProductSpec extends FlatSpec {
 
+  "Zero param formats" should "work for products and security" in {
+
+    case class EmptyParameters()
+
+    implicitly[SecurityDefinitionsJsonFormat[HNil]]
+
+    implicitly[JsonFormat[OpenApi[PathItem[EmptyParameters, () => Route, HNil] :: HNil, HNil]]]
+
+    implicitly[JsonFormat[OpenApi[PathItem[HNil, () => Route, HNil] :: HNil, HNil]]]
+
+  }
+
   "Zero param formats" should "work for products" in {
 
     case class EmptyParameters()

@@ -75,8 +75,11 @@ trait OpenApiJsonProtocol extends
     JsObject(fields: _*)
   }
 
+  implicit def apiWriterNoSecurityDefs[Paths]
+  (implicit ev: PathsJsonFormat[Paths]): RootJsonWriter[OpenApi[Paths, Nothing]] = apiWriter[Paths, Nothing]
+
   implicit def apiWriter[Paths, SecurityDefinitions]
-  (implicit ev: PathsJsonFormat[Paths]): RootJsonWriter[OpenApi[Paths, SecurityDefinitions]] =
+  (implicit ev: PathsJsonFormat[Paths], ev2: SecurityDefinitionsJsonFormat[SecurityDefinitions]): RootJsonWriter[OpenApi[Paths, SecurityDefinitions]] =
     new RootJsonWriter[OpenApi[Paths, SecurityDefinitions]] {
       override def write(api: OpenApi[Paths, SecurityDefinitions]): JsValue = {
 
@@ -87,17 +90,22 @@ trait OpenApiJsonProtocol extends
           Some("info" -> infoWriter.write(api.info)),
           api.host.map("host" -> JsString(_)),
           api.basePath.map("basePath" -> JsString(_)),
+          api.securityDefinitions.map(sd => "securityDefinitions" -> ev2.write(sd)),
           asJsArray("schemes", api.schemes),
           asJsArray("consumes", api.consumes),
           asJsArray("produces", api.produces),
-          Some("paths" -> paths)).flatten
+          Some("paths" -> paths)
+        ).flatten
 
         JsObject(fields: _*)
       }
     }
 
+  implicit def apiFormatNoSecurityDefs[Paths]
+  (implicit ev: PathsJsonFormat[Paths]): RootJsonFormat[OpenApi[Paths, Nothing]] = apiFormat[Paths, Nothing]
+
   implicit def apiFormat[Paths, SecurityDefinitions]
-  (implicit ev: PathsJsonFormat[Paths]): RootJsonFormat[OpenApi[Paths, SecurityDefinitions]] =
+  (implicit ev: PathsJsonFormat[Paths], ev2: SecurityDefinitionsJsonFormat[SecurityDefinitions]): RootJsonFormat[OpenApi[Paths, SecurityDefinitions]] =
     lift(apiWriter[Paths, SecurityDefinitions])
 
   private def asJsArray(key: String, entries: Option[Seq[_]]): Option[(String, JsValue)] = {

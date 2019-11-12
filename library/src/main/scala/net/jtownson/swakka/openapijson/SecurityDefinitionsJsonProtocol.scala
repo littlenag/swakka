@@ -139,6 +139,9 @@ trait SecurityDefinitionsJsonProtocol {
     : SecurityDefinitionsJsonFormat[Defs] =
     instance(defs => ev.value.write(gen.to(defs)))
 
+  implicit val nothingWriterRecord: SecurityDefinitionsJsonFormat[Nothing] =
+    SecurityDefinitionsJsonFormat.instance[Nothing](_ => throw new UnsupportedOperationException("Expected no security definitions!"))
+
 }
 
 object SecurityDefinitionsJsonProtocol extends SecurityDefinitionsJsonProtocol

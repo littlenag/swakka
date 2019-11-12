@@ -730,6 +730,21 @@ class Petstore2Spec
       "host" -> JsString("petstore.swagger.io"),
       "basePath" -> JsString("/v2"),
       "schemes" -> JsArray(JsString("http")),
+      "securityDefinitions" -> JsObject(
+        "api_key"-> JsObject(
+          "type" -> JsString("apiKey"),
+          "name" -> JsString("api_key"),
+          "in" -> JsString("header")
+        ),
+        "petstore_auth" -> JsObject(
+          "type" -> JsString("oauth2"),
+          "flow" -> JsString("implicit"),
+          "authorizationUrl" -> JsString("http://petstore.swagger.io/oauth/dialog"),
+          "scopes"-> JsObject(
+            "write:pets" -> JsString("modify pets in your account"),
+            "read:pets" -> JsString("read your pets"))
+        ),
+      ),
       "paths" -> JsObject(
         "/pets" -> JsObject(
           "post" -> JsObject(
